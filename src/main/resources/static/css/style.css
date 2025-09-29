@@ -1,0 +1,12 @@
+/* アニメーション効果 */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.navbar-brand {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.navbar-brand:hover {
+    opacity: 0.8;
+}

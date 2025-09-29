@@ -1,0 +1,20 @@
+# Mavenのビルド成果物を除外
+target/
+
+# IDE関連のファイルを除外
+.idea/
+*.iml
+
+# Git関連のファイルを除外
+.git/
+.gitignore
+
+# OSやエディタの一時ファイルを除外
+.DS_Store
+*.swp
+
+# ログファイルを除外
+*.log
+
+# Docker関連の不要なファイルを除外
+docker-compose.override.yml

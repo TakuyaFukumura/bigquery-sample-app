@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # Maven依存関係の更新設定
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    # PRの割り当て設定
+    assignees:
+      - "TakuyaFukumura"
+    # PRテンプレートの設定
+    pull-request-branch-name:
+      separator: "-"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # 更新対象の設定
+    open-pull-requests-limit: 5
+  # GitHub Actionsの更新設定
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    labels:
+      - "dependencies"
+    assignees:
+      - "TakuyaFukumura"
+    open-pull-requests-limit: 5
+  # Dockerイメージの依存関係自動更新設定
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    assignees:
+      - "TakuyaFukumura"
+    open-pull-requests-limit: 5

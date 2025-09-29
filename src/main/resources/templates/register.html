@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="https://www.thymeleaf.org" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー登録</title>
+    <!-- 共通CSSフラグメント -->
+    <th:block th:replace="~{fragments/common-css :: commonCss}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- メインコンテンツ -->
+<main class="flex-grow-1 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <!-- ヘッダー -->
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="text-center flex-grow-1">
+                                <h1 class="card-title h3 mb-3 text-primary">
+                                    <i class="bi bi-person-plus-fill me-2"></i>ユーザー登録
+                                </h1>
+                            </div>
+                            <!-- ダークモード切替ボタン -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="darkModeToggle" title="ダークモード切替">
+                                <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+                            </button>
+                        </div>
+
+                        <!-- エラーメッセージ表示 -->
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <!-- 登録フォーム -->
+                        <form th:action="@{/register}" th:object="${userRegistration}" method="post" novalidate>
+                            <!-- ユーザー名 -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person me-1"></i>ユーザー名
+                                </label>
+                                <input type="text"
+                                       th:field="*{username}"
+                                       id="username"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                       placeholder="ユーザー名を入力してください">
+                                <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback">
+                                    <span th:errors="*{username}"></span>
+                                </div>
+                            </div>
+
+                            <!-- パスワード -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-1"></i>パスワード
+                                </label>
+                                <input type="password"
+                                       th:field="*{password}"
+                                       id="password"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       placeholder="パスワードを入力してください">
+                                <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback">
+                                    <span th:errors="*{password}"></span>
+                                </div>
+                            </div>
+
+                            <!-- パスワード確認 -->
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">
+                                    <i class="bi bi-lock-fill me-1"></i>パスワード確認
+                                </label>
+                                <input type="password"
+                                       th:field="*{confirmPassword}"
+                                       id="confirmPassword"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
+                                       placeholder="パスワードを再入力してください">
+                                <div th:if="${#fields.hasErrors('confirmPassword')}" class="invalid-feedback">
+                                    <span th:errors="*{confirmPassword}"></span>
+                                </div>
+                            </div>
+
+                            <!-- 送信ボタン -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-person-plus me-1"></i>登録
+                                </button>
+                            </div>
+
+                            <!-- ログインリンク -->
+                            <div class="text-center">
+                                <p class="mb-0 text-muted small">
+                                    既にアカウントをお持ちですか？
+                                    <a href="/login" class="text-decoration-none">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>ログイン
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 共通フッター -->
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<!-- ダークモード切替スクリプト -->
+<script>
+    // ダークモード切替機能
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    const htmlElement = document.documentElement;
+
+    if (darkModeToggle && darkModeIcon) {
+        // 保存されたテーマを読み込み
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        darkModeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                darkModeIcon.className = 'bi bi-sun-fill';
+            } else {
+                darkModeIcon.className = 'bi bi-moon-fill';
+            }
+        }
+    }
+</script>
+</body>
+</html>

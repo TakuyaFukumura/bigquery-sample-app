@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="https://www.thymeleaf.org" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン</title>
+    <!-- 共通CSSフラグメント -->
+    <th:block th:replace="~{fragments/common-css :: commonCss}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- メインコンテンツ -->
+<main class="flex-grow-1 d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <!-- ヘッダー -->
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="text-center flex-grow-1">
+                                <h1 class="card-title h3 mb-3 text-primary">
+                                    <i class="bi bi-gear-fill me-2"></i>Basic Spring Boot App
+                                </h1>
+                                <p class="text-muted">ログインしてください</p>
+                            </div>
+                            <!-- ダークモード切替ボタン -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="darkModeToggle" title="ダークモード切替">
+                                <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+                            </button>
+                        </div>
+
+                        <!-- 成功メッセージ表示 -->
+                        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${successMessage}"></span>
+                        </div>
+
+                        <!-- ログアウトメッセージ表示 -->
+                        <div th:if="${param.logout}" class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            ログアウトしました。
+                        </div>
+
+                        <!-- エラーメッセージ表示 -->
+                        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            ユーザー名またはパスワードが間違っています。
+                        </div>
+
+                        <!-- ログインフォーム -->
+                        <form th:action="@{/login}" method="post">
+                            <!-- ユーザー名 -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person me-1"></i>ユーザー名
+                                </label>
+                                <input type="text"
+                                       id="username"
+                                       name="username"
+                                       class="form-control"
+                                       placeholder="ユーザー名を入力してください"
+                                       required>
+                            </div>
+
+                            <!-- パスワード -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-1"></i>パスワード
+                                </label>
+                                <input type="password"
+                                       id="password"
+                                       name="password"
+                                       class="form-control"
+                                       placeholder="パスワードを入力してください"
+                                       required>
+                            </div>
+
+                            <!-- ログインボタン -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>ログイン
+                                </button>
+                            </div>
+
+                            <!-- 登録リンク -->
+                            <div class="text-center">
+                                <p class="mb-0 text-muted small">
+                                    アカウントをお持ちでない場合は
+                                    <a href="/register" class="text-decoration-none">
+                                        <i class="bi bi-person-plus me-1"></i>新規登録
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 共通フッター -->
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<!-- ダークモード切替スクリプト -->
+<script>
+    // ダークモード切替機能
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    const htmlElement = document.documentElement;
+
+    if (darkModeToggle && darkModeIcon) {
+        // 保存されたテーマを読み込み
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        darkModeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                darkModeIcon.className = 'bi bi-sun-fill';
+            } else {
+                darkModeIcon.className = 'bi bi-moon-fill';
+            }
+        }
+    }
+</script>
+</body>
+</html>

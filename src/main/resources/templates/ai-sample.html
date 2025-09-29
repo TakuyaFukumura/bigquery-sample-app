@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="https://www.thymeleaf.org" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI機能サンプル</title>
+    <!-- 共通CSSフラグメント -->
+    <th:block th:replace="~{fragments/common-css :: commonCss}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- 共通ヘッダー -->
+    <th:block th:replace="~{fragments/header :: header}"></th:block>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <!-- ページタイトル -->
+                            <h1 class="card-title h3 mb-4 text-center text-primary">
+                                <i class="bi bi-robot me-2"></i>AI機能サンプル
+                            </h1>
+                            
+                            <!-- 説明 -->
+                            <div class="alert alert-info border-start border-4 border-info mb-4">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                このページではAI（Gemini API）を使用した豆知識取得機能をお試しいただけます。
+                            </div>
+
+                            <!-- 豆知識取得フォーム -->
+                            <form th:action="@{/ai/trivia}" method="post" class="text-center mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-lightbulb-fill me-2"></i>豆知識を取得
+                                </button>
+                            </form>
+
+                            <!-- 成功メッセージと豆知識表示 -->
+                            <div th:if="${success != null and success}" class="alert alert-success border-start border-4 border-success">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-check-circle-fill me-2"></i>豆知識を取得しました！
+                                </h5>
+                                <hr>
+                                <p class="mb-0 fs-6" th:text="${trivia}">ここに豆知識が表示されます</p>
+                            </div>
+
+                            <!-- エラーメッセージ表示 -->
+                            <div th:if="${success != null and !success}" class="alert alert-danger border-start border-4 border-danger">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>エラーが発生しました
+                                </h5>
+                                <hr>
+                                <p class="mb-0" th:text="${error}">エラーメッセージがここに表示されます</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 共通フッター -->
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>
