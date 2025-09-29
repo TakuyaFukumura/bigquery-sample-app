@@ -13,7 +13,7 @@ RUN mvn clean package -DskipTests
 
 # --- 実行用ステージ ---
 ## 実行用の軽量イメージ
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 ## 非rootユーザーでの実行
 RUN addgroup -g 1001 spring && adduser -u 1001 -G spring -s /bin/sh -D spring
