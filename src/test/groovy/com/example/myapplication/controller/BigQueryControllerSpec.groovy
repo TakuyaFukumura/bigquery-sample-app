@@ -21,14 +21,14 @@ class BigQueryControllerSpec extends Specification {
     def mockMvc = MockMvcBuilders.standaloneSetup(bigQueryController).build()
     def objectMapper = new ObjectMapper()
 
-    def "GET /bigquery/query でクエリが正常に実行されること"() {
+    def "GET /bigquery/api/query でクエリが正常に実行されること"() {
         given: "サービスからのレスポンス"
         def testData = [
                 ["id": 1, "name": "テストユーザー"]
         ]
 
         when: "クエリエンドポイントにGETリクエストを送信"
-        def result = mockMvc.perform(get("/bigquery/query")
+        def result = mockMvc.perform(get("/bigquery/api/query")
                 .param("sql", "SELECT * FROM test_table"))
 
         then: "サービスのrunQueryが1回呼び出される"
@@ -42,9 +42,9 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.data[0].name').value("テストユーザー"))
     }
 
-    def "GET /bigquery/query で無効なクエリパラメータを渡すとBadRequestが返されること"() {
+    def "GET /bigquery/api/query で無効なクエリパラメータを渡すとBadRequestが返されること"() {
         when: "空のクエリでリクエストを送信"
-        def result = mockMvc.perform(get("/bigquery/query")
+        def result = mockMvc.perform(get("/bigquery/api/query")
                 .param("sql", ""))
 
         then: "サービスから例外が発生"
@@ -56,9 +56,9 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.error').value("SQLクエリが空です"))
     }
 
-    def "POST /bigquery/table/{tableName} でテーブルが正常に作成されること"() {
+    def "POST /bigquery/api/table/{tableName} でテーブルが正常に作成されること"() {
         when: "テーブル作成エンドポイントにPOSTリクエストを送信"
-        def result = mockMvc.perform(post("/bigquery/table/test_table"))
+        def result = mockMvc.perform(post("/bigquery/api/table/test_table"))
 
         then: "サービスのcreateTableが1回呼び出される"
         1 * bigQueryService.createTable("test_table", _)
@@ -69,7 +69,7 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.message').value("テーブルが正常に作成されました: test_table"))
     }
 
-    def "POST /bigquery/table/{tableName}/data でデータが正常に挿入されること"() {
+    def "POST /bigquery/api/table/{tableName}/data でデータが正常に挿入されること"() {
         given: "挿入するテストデータ"
         def testData = [
                 ["id": 1, "name": "テストユーザー1"],
@@ -77,7 +77,7 @@ class BigQueryControllerSpec extends Specification {
         ]
 
         when: "データ挿入エンドポイントにPOSTリクエストを送信"
-        def result = mockMvc.perform(post("/bigquery/table/test_table/data")
+        def result = mockMvc.perform(post("/bigquery/api/table/test_table/data")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testData)))
 
@@ -90,9 +90,9 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.message').value("2 件のデータが正常に挿入されました"))
     }
 
-    def "DELETE /bigquery/table/{tableName} でテーブルが正常に削除されること"() {
+    def "DELETE /bigquery/api/table/{tableName} でテーブルが正常に削除されること"() {
         when: "テーブル削除エンドポイントにDELETEリクエストを送信"
-        def result = mockMvc.perform(delete("/bigquery/table/test_table"))
+        def result = mockMvc.perform(delete("/bigquery/api/table/test_table"))
 
         then: "サービスのdeleteTableが1回呼び出される"
         1 * bigQueryService.deleteTable("test_table")
@@ -103,12 +103,12 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.message').value("テーブルが正常に削除されました: test_table"))
     }
 
-    def "GET /bigquery/tables でテーブル一覧が正常に取得されること"() {
+    def "GET /bigquery/api/tables でテーブル一覧が正常に取得されること"() {
         given: "サービスからのテーブル一覧"
         def tableList = ["table1", "table2", "table3"]
 
         when: "テーブル一覧エンドポイントにGETリクエストを送信"
-        def result = mockMvc.perform(get("/bigquery/tables"))
+        def result = mockMvc.perform(get("/bigquery/api/tables"))
 
         then: "サービスのlistTablesが1回呼び出される"
         1 * bigQueryService.listTables() >> tableList
@@ -122,12 +122,12 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.tables[2]').value("table3"))
     }
 
-    def "GET /bigquery/health でヘルスチェックが正常に実行されること"() {
+    def "GET /bigquery/api/health でヘルスチェックが正常に実行されること"() {
         given: "サービスからの正常なレスポンス"
         def healthData = [["health_check": 1]]
 
         when: "ヘルスチェックエンドポイントにGETリクエストを送信"
-        def result = mockMvc.perform(get("/bigquery/health"))
+        def result = mockMvc.perform(get("/bigquery/api/health"))
 
         then: "サービスのrunQueryが1回呼び出される"
         1 * bigQueryService.runQuery("SELECT 1 as health_check") >> healthData
@@ -138,9 +138,9 @@ class BigQueryControllerSpec extends Specification {
               .andExpect(jsonPath('$.status').value("BigQuery connection is healthy"))
     }
 
-    def "GET /bigquery/health でBigQuery接続エラーが発生した場合Internal Server Errorが返されること"() {
+    def "GET /bigquery/api/health でBigQuery接続エラーが発生した場合Internal Server Errorが返されること"() {
         when: "ヘルスチェックエンドポイントにGETリクエストを送信"
-        def result = mockMvc.perform(get("/bigquery/health"))
+        def result = mockMvc.perform(get("/bigquery/api/health"))
 
         then: "サービスから例外が発生"
         1 * bigQueryService.runQuery("SELECT 1 as health_check") >> { throw new RuntimeException("接続失敗") }
