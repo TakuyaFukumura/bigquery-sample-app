@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="https://www.thymeleaf.org" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery操作</title>
+    <!-- 共通CSSフラグメント -->
+    <th:block th:replace="~{fragments/common-css :: commonCss}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- 共通ヘッダー -->
+    <th:block th:replace="~{fragments/header :: header}"></th:block>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="row">
+                <!-- 左カラム: テーブル一覧 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+                            <h2 class="card-title h5 mb-4 text-primary">
+                                <i class="bi bi-table me-2"></i>テーブル一覧
+                            </h2>
+                            
+                            <!-- テーブル一覧表示 -->
+                            <div th:if="${tables != null and !tables.isEmpty()}">
+                                <div class="list-group">
+                                    <div th:each="table : ${tables}" class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-table me-2"></i><span th:text="${table}">table_name</span></span>
+                                        <form th:action="@{/bigquery/delete-table}" method="post" class="d-inline" 
+                                              onsubmit="return confirm('テーブル「' + this.querySelector('input[name=tableName]').value + '」を削除してもよろしいですか？');">
+                                            <input type="hidden" name="tableName" th:value="${table}" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="削除">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${tables == null or tables.isEmpty()}" class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle me-2"></i>テーブルがありません
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右カラム: 操作エリア -->
+                <div class="col-md-8">
+                    <!-- ページタイトル -->
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h1 class="card-title h3 mb-3 text-primary">
+                                <i class="bi bi-database-fill-gear me-2"></i>BigQuery操作
+                            </h1>
+                            <div class="alert alert-info border-start border-4 border-info mb-0">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Google BigQueryのテーブル操作とクエリ実行を行えます。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- テーブル作成 -->
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title h5 mb-3">
+                                <i class="bi bi-plus-circle me-2"></i>テーブル作成
+                            </h2>
+                            
+                            <!-- 成功メッセージ -->
+                            <div th:if="${createSuccess != null and createSuccess}" class="alert alert-success border-start border-4 border-success">
+                                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${createMessage}">テーブルが作成されました</span>
+                            </div>
+                            
+                            <!-- エラーメッセージ -->
+                            <div th:if="${createSuccess != null and !createSuccess}" class="alert alert-danger border-start border-4 border-danger">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${createError}">エラー</span>
+                            </div>
+                            
+                            <form th:action="@{/bigquery/create-table}" method="post">
+                                <div class="mb-3">
+                                    <label for="tableName" class="form-label">テーブル名</label>
+                                    <input type="text" class="form-control" id="tableName" name="tableName" 
+                                           placeholder="例: users" required>
+                                    <div class="form-text">
+                                        サンプルスキーマ: id (INT64), name (STRING), email (STRING), created_at (TIMESTAMP)
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>テーブルを作成
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- SQLクエリ実行 -->
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title h5 mb-3">
+                                <i class="bi bi-code-square me-2"></i>SQLクエリ実行
+                            </h2>
+                            
+                            <!-- 成功メッセージ -->
+                            <div th:if="${querySuccess != null and querySuccess}" class="alert alert-success border-start border-4 border-success">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                クエリが正常に実行されました（<span th:text="${queryResultCount}">0</span> 件の結果）
+                            </div>
+                            
+                            <!-- エラーメッセージ -->
+                            <div th:if="${querySuccess != null and !querySuccess}" class="alert alert-danger border-start border-4 border-danger">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${queryError}">エラー</span>
+                            </div>
+                            
+                            <form th:action="@{/bigquery/execute-query}" method="post">
+                                <div class="mb-3">
+                                    <label for="sql" class="form-label">SQLクエリ</label>
+                                    <textarea class="form-control font-monospace" id="sql" name="sql" rows="4" 
+                                              placeholder="SELECT * FROM users LIMIT 10" required></textarea>
+                                    <div class="form-text">
+                                        開発モードでは、サンプルデータが返されます
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-play-fill me-2"></i>クエリを実行
+                                </button>
+                            </form>
+                            
+                            <!-- クエリ結果表示 -->
+                            <div th:if="${queryResult != null and !queryResult.isEmpty()}" class="mt-4">
+                                <h3 class="h6 mb-3">
+                                    <i class="bi bi-table me-2"></i>クエリ結果
+                                    <span class="badge bg-primary ms-2" th:text="${queryResultCount} + ' 件'">0 件</span>
+                                </h3>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover table-sm">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th th:each="key : ${queryResult[0].keySet()}" th:text="${key}">Column</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="row : ${queryResult}">
+                                                <td th:each="key : ${row.keySet()}" th:text="${row.get(key)}">Value</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 共通フッター -->
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>
