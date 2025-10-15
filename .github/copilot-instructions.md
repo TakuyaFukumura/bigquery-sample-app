@@ -96,7 +96,7 @@ src/
 
 ### 環境変数
 以下の環境変数を設定することで、本番環境での動作を制御できます：
-- **GOOGLE_APPLICATION_CREDENTIALS**: BigQueryサービスアカウントキーファイルのパス（本番モードで必須）
+- **GOOGLE_APPLICATION_CREDENTIALS**: Google CloudサービスアカウントJSONキーファイルのパス（本番モードで必須）
 - **BIGQUERY_PROJECT_ID**: BigQueryプロジェクトID（デフォルト: sample-project）
 - **BIGQUERY_DATASET_ID**: BigQueryデータセットID（デフォルト: sample_dataset）
 - **GEMINI_API_KEY**: Gemini APIキー（設定されていない場合はサンプルデータを返す）
