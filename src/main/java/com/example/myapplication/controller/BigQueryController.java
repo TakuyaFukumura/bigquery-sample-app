@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Slf4j
 @Controller
-@RequestMapping("/bigquery")
+@RequestMapping("/")
 public class BigQueryController {
 
     private final BigQueryService bigQueryService;
@@ -159,7 +159,7 @@ public class BigQueryController {
      * @param sql 実行するSQLクエリ
      * @return クエリ結果
      */
-    @GetMapping("/api/query")
+    @GetMapping("/bigquery/api/query")
     @ResponseBody
     public ResponseEntity<?> runQuery(@RequestParam String sql) {
         try {
@@ -191,7 +191,7 @@ public class BigQueryController {
      * @param tableName テーブル名
      * @return 作成結果
      */
-    @PostMapping("/api/table/{tableName}")
+    @PostMapping("/bigquery/api/table/{tableName}")
     @ResponseBody
     public ResponseEntity<?> createSampleTable(@PathVariable String tableName) {
         try {
@@ -233,7 +233,7 @@ public class BigQueryController {
      * @param data      挿入するデータ
      * @return 挿入結果
      */
-    @PostMapping("/api/table/{tableName}/data")
+    @PostMapping("/bigquery/api/table/{tableName}/data")
     @ResponseBody
     public ResponseEntity<?> insertData(@PathVariable String tableName,
                                        @RequestBody List<Map<String, Object>> data) {
@@ -266,7 +266,7 @@ public class BigQueryController {
      * @param tableName 削除するテーブル名
      * @return 削除結果
      */
-    @DeleteMapping("/api/table/{tableName}")
+    @DeleteMapping("/bigquery/api/table/{tableName}")
     @ResponseBody
     public ResponseEntity<?> deleteTable(@PathVariable String tableName) {
         try {
@@ -297,7 +297,7 @@ public class BigQueryController {
      *
      * @return テーブル一覧
      */
-    @GetMapping("/api/tables")
+    @GetMapping("/bigquery/api/tables")
     @ResponseBody
     public ResponseEntity<?> listTables() {
         try {
@@ -323,7 +323,7 @@ public class BigQueryController {
      *
      * @return 接続状態
      */
-    @GetMapping("/api/health")
+    @GetMapping("/bigquery/api/health")
     @ResponseBody
     public ResponseEntity<?> healthCheck() {
         try {
