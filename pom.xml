@@ -5,7 +5,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>myproject</artifactId>
-    <version>0.2.0</version>
+    <version>1.0.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -63,11 +63,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.42</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- WebClient：HTTP API呼び出し用のリアクティブHTTPクライアント -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
             <!-- Google Cloud BigQuery：データウェアハウスサービス -->
