@@ -18,7 +18,7 @@ Spring BootアプリケーションとGoogle BigQueryを連携させるサンプ
 
 ## 技術スタック
 
-- **Spring Boot 3.5.5** - メインフレームワーク
+- **Spring Boot 3.5.6** - メインフレームワーク
 - **Java 17** - プログラミング言語
 - **Maven** - ビルドツール
 - **Google Cloud BigQuery 2.38.0** - データウェアハウス
@@ -102,31 +102,39 @@ java -jar target/myproject.jar
 
 アプリケーション起動後、以下のエンドポイントが利用可能です：
 
-### BigQuery API
+### BigQuery Web UI
+
+#### BigQuery操作画面（ホームページ）
+```
+GET /
+```
+BigQueryのテーブル操作とクエリ実行を行うWebインターフェース
+
+### BigQuery REST API
 
 #### ヘルスチェック
 ```
-GET /bigquery/health
+GET /bigquery/api/health
 ```
 
 #### クエリ実行
 ```
-GET /bigquery/query?sql=SELECT 1 as test
+GET /bigquery/api/query?sql=SELECT 1 as test
 ```
 
 #### テーブル一覧取得
 ```
-GET /bigquery/tables
+GET /bigquery/api/tables
 ```
 
 #### テーブル作成（サンプルスキーマ）
 ```
-POST /bigquery/table/{tableName}
+POST /bigquery/api/table/{tableName}
 ```
 
 #### データ挿入
 ```
-POST /bigquery/table/{tableName}/data
+POST /bigquery/api/table/{tableName}/data
 Content-Type: application/json
 
 [
@@ -137,15 +145,10 @@ Content-Type: application/json
 
 #### テーブル削除
 ```
-DELETE /bigquery/table/{tableName}
+DELETE /bigquery/api/table/{tableName}
 ```
 
 ### その他のエンドポイント
-
-#### ホームページ
-```
-GET /
-```
 
 #### ヘルスチェック
 ```
@@ -161,29 +164,29 @@ GET /h2-console
 
 ### 1. 接続確認
 ```bash
-curl http://localhost:8080/bigquery/health
+curl http://localhost:8080/bigquery/api/health
 ```
 
 ### 2. テーブル作成
 ```bash
-curl -X POST http://localhost:8080/bigquery/table/users
+curl -X POST http://localhost:8080/bigquery/api/table/users
 ```
 
 ### 3. データ挿入
 ```bash
-curl -X POST http://localhost:8080/bigquery/table/users/data \
+curl -X POST http://localhost:8080/bigquery/api/table/users/data \
   -H "Content-Type: application/json" \
   -d '[{"id": 1, "name": "田中太郎", "email": "tanaka@example.com", "created_at": "2023-01-01T00:00:00Z"}]'
 ```
 
 ### 4. データ取得
 ```bash
-curl "http://localhost:8080/bigquery/query?sql=SELECT * FROM users LIMIT 10"
+curl "http://localhost:8080/bigquery/api/query?sql=SELECT * FROM users LIMIT 10"
 ```
 
 ### 5. テーブル削除
 ```bash
-curl -X DELETE http://localhost:8080/bigquery/table/users
+curl -X DELETE http://localhost:8080/bigquery/api/table/users
 ```
 
 ## 設定
@@ -219,6 +222,7 @@ app.bigquery.dataset-id=${BIGQUERY_DATASET_ID:sample_dataset}
 ./mvnw spring-boot:run
 ```
 - ホームページ（`http://localhost:8080`）にアクセスするとログインページにリダイレクトされます
+- ログイン後、BigQuery操作画面が表示されます
 - デフォルトユーザーでログインできます（詳細はデータベース初期化ファイルを参照）
 
 ### 開発モード（認証無効）
@@ -226,8 +230,8 @@ app.bigquery.dataset-id=${BIGQUERY_DATASET_ID:sample_dataset}
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-- 認証なしで全てのページにアクセス可能
-- BigQuery APIにも認証なしでアクセス可能
+- 認証なしで全てのページにアクセス可能（トップページはBigQuery操作画面）
+- BigQuery REST APIにも認証なしでアクセス可能
 - H2コンソール（`http://localhost:8080/h2-console`）にもアクセス可能
 
 ### 注意事項
