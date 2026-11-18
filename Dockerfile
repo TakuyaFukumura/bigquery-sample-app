@@ -1,6 +1,6 @@
 # --- ビルド用ステージ ---
 ## MavenとJDKが入った公式イメージを使用（Java 21, Alpineベース）
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
+FROM maven:3.9-eclipse-temurin-26-alpine AS build
 
 ## 作業ディレクトリを/appに設定
 WORKDIR /app
@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 
 ## テストをスキップしてMavenでパッケージング（JARファイルを生成）
-RUN mvn clean package -DskipTests
+RUN mvn clean package -Dmaven.test.skip=true
 
 # --- 実行用ステージ ---
 ## 実行用の軽量イメージ
